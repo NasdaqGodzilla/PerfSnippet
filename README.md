@@ -4,6 +4,12 @@ Performance Snippet. 性能片段。
 
 提供adb shell中执行的脚本、工具，用于监测、统计Android性能数据。
 
+# mem
+
+## mem_monitor
+
+根据/proc/meminfo中的MemAvaiable、MemFree，统计窗口时间内的最小值和平均值。
+
 # LICENSE
 
 Copyright (C) <2022> NiKo Zhong
