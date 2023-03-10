@@ -31,8 +31,9 @@ function perfsnippet_testloop_start() {
     while true; do
         [[ "true" == "$REQUEST_TERMINATE" ]] && break;
 
-        mem_recorder_print
-        sleep 1
+        local record="$(echo -e "`perfsnippet_recordstep_run`")"
+        perfsnippet_teststep_once "$record"
+        perfsnippet_testplan_review
     done
 
     perfsnippet_teststep_postrun
@@ -58,7 +59,28 @@ function perfsnippet_teststep_prerun() {
 # 执行recorder
 function perfsnippet_teststep_run() {
     echo PerfSnippet RUNNING
+}
 
+# 执行完一次recorder
+# 输出到目标
+# 执行间隔休眠
+function perfsnippet_teststep_once() {
+    echo new record: $1
+    sleep 1
+}
+
+# 确认测试计划是否完成，决定是否继续进行测试
+function perfsnippet_testplan_review() {
+    local testplan_reached=`perfsnippet_testplan_reached`
+    [[ "true" == "$testplan_reached" ]] && { \
+        perfsnippet_request_terminate
+    }
+}
+
+# 是否达成测试目标
+# TODO
+function perfsnippet_testplan_reached() {
+    echo false
 }
 
 function perfsnippet_teststep_postrun() {
@@ -73,9 +95,8 @@ function perfsnippet_recordstep_prerun() {
 
 }
 
-# 决定输出目标
 function perfsnippet_recordstep_run() {
-    echo pass recordstep run
+    mem_recorder_print
 }
 
 function perfsnippet_recordstep_postrun() {
