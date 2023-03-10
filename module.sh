@@ -1,8 +1,14 @@
 #!/bin/bash
 
 function module_import() {
-    local m_ = "$1"
-    echo Loading "$m_"
-    source "$m_"
+    local m="$1"
+    echo Loading "$m"
+    source "$m"
 }
+
+function module_cwd() {
+    echo $(readlink -f "${BASH_SOURCE[0]}")
+}
+
+export PATH_ROOT=`module_cwd`
 
