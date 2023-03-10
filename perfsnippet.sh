@@ -1,19 +1,32 @@
 #!/bin/bash
 
+[[ "" == "$PS_INTERVAL_DEFAULT" ]] && \
+    readonly PS_INTERVAL_DEFAULT=5
+
 export ENABLE_MEMINFO
 
-export REQUEST_TERMINATE=false
+export CONFIG_PS_INTERVAL
+
+export REQUEST_TERMINATE
 
 function perfsnippet_parse() {
+    REQUEST_TERMINATE=false
+
     ENABLE_MEMINFO=true
     [[ "1" == "$ps_meminfo_disabled" ]] && { \
-        echo "PerfSnippet meminfo disabled"
         ENABLE_MEMINFO=false
+    }
+
+    CONFIG_PS_INTERVAL=$PS_INTERVAL_DEFAULT
+    [[ "0" -lt "$ps_interval" ]] && { \
+        CONFIG_PS_INTERVAL=$ps_interval
     }
 }
 
 function perfsnippet_testplan_print() {
     echo "ENABLE_MEMINFO\t$ENABLE_MEMINFO"
+
+    echo "CONFIG_PS_INTERVAL\t$CONFIG_PS_INTERVAL"
 }
 
 function perfsnippet_stop() {
@@ -66,7 +79,11 @@ function perfsnippet_teststep_run() {
 # 执行间隔休眠
 function perfsnippet_teststep_once() {
     echo new record: $1
-    sleep 1
+    perfsnippet_teststep_interval
+}
+
+function perfsnippet_teststep_interval() {
+    sleep $CONFIG_PS_INTERVAL
 }
 
 # 确认测试计划是否完成，决定是否继续进行测试
