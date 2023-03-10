@@ -2,6 +2,7 @@
 
 export ENABLE_MEMINFO
 
+export REQUEST_TERMINATE=false
 
 function perfsnippet_parse() {
     ENABLE_MEMINFO=true
@@ -28,6 +29,8 @@ function perfsnippet_testloop_start() {
     perfsnippet_teststep_prerun
 
     while true; do
+        [[ "true" == "$REQUEST_TERMINATE" ]] && break;
+
         mem_recorder_print
         sleep 1
     done
@@ -61,6 +64,8 @@ function perfsnippet_teststep_run() {
 function perfsnippet_teststep_postrun() {
     echo pass teststep postrun
 
+    perfsnippet_signal
+
 }
 
 function perfsnippet_recordstep_prerun() {
@@ -87,8 +92,22 @@ function perfsnippet_loadmodule() {
 }
 
 function perfsnippet() {
+    perfsnippet_signal true
     perfsnippet_parse $*
     perfsnippet_loadmodule
     perfsnippet_start
+}
+
+function perfsnippet_signal() {
+    [[ "true" == "$1" ]] && { \
+        trap  perfsnippet_request_terminate SIGHUP SIGINT SIGTERM EXIT
+        return
+    }
+
+    trap - SIGHUP SIGINT SIGTERM EXIT
+}
+
+function perfsnippet_request_terminate() {
+    REQUEST_TERMINATE=true
 }
 
