@@ -24,9 +24,36 @@ function mem_recorder_get_memavai() {
     echo `echo -e "$meminfo" | awk '/MemAvailable/{print $2}'`
 }
 
+function mem_recorder_print() {
+    local request="$1"
+    local meminfo="$(echo -e "`mem_recorder_get_meminfo`")"
+    local memfree=`eval "mem_recorder_get_memfree \"echo $meminfo\""`
+    local memavai=`eval "mem_recorder_get_memavai \"echo $meminfo\""`
+
+    if [[ "$request" == 'kB' ]]; then
+        echo $memfree $memavai
+        return
+    fi
+
+    local memfree_mb=`utils_kb2mb $memfree`
+    local memavai_mb=`utils_kb2mb $memavai`
+
+    echo $memfree_mb $memavai_mb
+}
+
 function mem_recorder_test() {
-    mem_recorder_get_memfree "echo `mem_recorder_get_meminfo`"
-    mem_recorder_get_memavai "echo `mem_recorder_get_meminfo`"
+    local meminfo="$(echo -e "`mem_recorder_get_meminfo`")"
+
+    local memfree=`eval "mem_recorder_get_memfree \"echo $meminfo\""`
+    local memfree_mb=`utils_kb2mb $memfree`
+    local memavai=`eval "mem_recorder_get_memavai \"echo $meminfo\""`
+    local memavai_mb=`utils_kb2mb $memavai`
+
+    echo "mem_recorder_test: meminfo:"
+    echo -e "$meminfo"
+    echo "mem_recorder_test: memfree: $memfree KiB($memfree_mb MB)"
+    echo "mem_recorder_test: memavai: $memavai KiB($memavai_mb MB)"
+    echo "mem_recorder_test: free-avai: " `mem_recorder_print kB` `mem_recorder_print`
 }
 
 mem_recorder_load

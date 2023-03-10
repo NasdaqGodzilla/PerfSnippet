@@ -1,6 +1,7 @@
 #!/bin/bash
 
 function mem_entry_load() {
+    module_import `realpath utils.sh`
     module_import `realpath mem/mem_recorder.sh`
     MODULE_MEM_LOADED=true
 }
