@@ -46,13 +46,15 @@ function mem_recorder_test() {
 
     local memfree=`eval "mem_recorder_get_memfree \"echo $meminfo\""`
     local memfree_mb=`utils_kb2mb $memfree`
+    local memfree_gb=`utils_mb2gb $memfree_mb`
     local memavai=`eval "mem_recorder_get_memavai \"echo $meminfo\""`
     local memavai_mb=`utils_kb2mb $memavai`
+    local memavai_gb=`utils_mb2gb $memavai_mb`
 
     echo "mem_recorder_test: meminfo:"
     echo -e "$meminfo"
-    echo "mem_recorder_test: memfree: $memfree KiB($memfree_mb MB)"
-    echo "mem_recorder_test: memavai: $memavai KiB($memavai_mb MB)"
+    echo "mem_recorder_test: memfree: $memfree KiB($memfree_mb MB/$memfree_gb GB)"
+    echo "mem_recorder_test: memavai: $memavai KiB($memavai_mb MB/$memavai_gb GB)"
     echo "mem_recorder_test: free-avai: " `mem_recorder_print kB` `mem_recorder_print`
 }
 
