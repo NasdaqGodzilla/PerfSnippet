@@ -61,7 +61,7 @@ function perfsnippet_stop() {
 }
 
 function perfsnippet_testloop_start() {
-    perfsnippet_recordstep_prerun
+    perfsnippet_printstep_prerun
     perfsnippet_teststep_prerun
 
     while
@@ -70,17 +70,17 @@ function perfsnippet_testloop_start() {
         let ++TESTSTEP_INDEX
         local now=$(timing_print_nowsecond)
 
-        local record="$(echo -e "`perfsnippet_recordstep_run`")"
-        perfsnippet_teststep_once "$record"
-
+        local record="$(echo -e "`perfsnippet_teststep_run`")"
+        perfsnippet_printstep_run "$record"
         local elpased=`timing_print_elpasedsecond $now`
         let TESTSTEP_ELPASED+=elpased
+        perfsnippet_teststep_once "$elpased"
 
         [[ "false" == $(perfsnippet_testplan_review) ]]
     do :; done
 
     perfsnippet_teststep_postrun
-    perfsnippet_recordstep_postrun
+    perfsnippet_printstep_postrun
 }
 
 function perfsnippet_start() {
@@ -105,19 +105,28 @@ function perfsnippet_teststep_prerun() {
 
 # 执行recorder
 function perfsnippet_teststep_run() {
-    echo PerfSnippet RUNNING
+    perfsnippet_printdebug "PerfSnippet RUNNING"
+
+    mem_recorder_print
 }
 
-# 执行完一次recorder
-# 输出到目标
-# 执行间隔休眠
+# 一小步测试步骤完成，执行间隔休眠使其满足间隔要求，根据interval-elpased计算本次需要休眠的时间
 function perfsnippet_teststep_once() {
-    perfsnippet_printdebug "New record: $1"
-    perfsnippet_teststep_interval
-}
+    local elpased="$1"
+    local would_sleep="$(echo $CONFIG_PS_INTERVAL-$elpased | bc)"
+    [[ "0" -gt "$would_sleep" ]] && would_sleep=0
 
-function perfsnippet_teststep_interval() {
-    sleep $CONFIG_PS_INTERVAL
+    [[ "true" == "$ENABLE_DEBUG" ]] && { \
+        local progress="$(echo "$TESTSTEP_ELPASED" "$CONFIG_PS_DURATION" | \
+                awk '{printf "%3.2f%%", $1 * 100 / $2}')"
+        perfsnippet_printdebug "[$TESTSTEP_ELPASED/$CONFIG_PS_DURATION] $progress" \
+            "ElpasedSum/elpased/Sleep: $TESTSTEP_ELPASED/$elpased/$would_sleep"
+    }
+
+    [[ "0" -ge "$would_sleep" ]] && return
+
+    sleep $would_sleep
+    let TESTSTEP_ELPASED+=would_sleep
 }
 
 # 确认测试计划是否完成，决定是否继续进行测试
@@ -144,17 +153,17 @@ function perfsnippet_teststep_postrun() {
     perfsnippet_signal
 }
 
-function perfsnippet_recordstep_prerun() {
-    echo pass recordstep prerun
+function perfsnippet_printstep_prerun() {
+    echo pass printstep prerun
 
 }
 
-function perfsnippet_recordstep_run() {
-    mem_recorder_print
+function perfsnippet_printstep_run() {
+    perfsnippet_printdebug "New record: $1"
 }
 
-function perfsnippet_recordstep_postrun() {
-    echo pass recordstep postrun
+function perfsnippet_printstep_postrun() {
+    echo pass printstep postrun
 }
 
 function perfsnippet_loadmodule() {
@@ -190,6 +199,7 @@ function perfsnippet_request_terminate() {
 function perfsnippet_printdebug() {
     [[ "true" != "$ENABLE_DEBUG" ]] && return
 
-    echo [debug]"\t$1"
+    >&2 \
+    echo [debug]"\t$*"
 }
 
