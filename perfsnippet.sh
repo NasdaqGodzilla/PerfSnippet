@@ -1,13 +1,23 @@
 #!/bin/bash
 
 [[ "" == "$PS_INTERVAL_DEFAULT" ]] && \
-    readonly PS_INTERVAL_DEFAULT=5
+    export readonly PS_INTERVAL_DEFAULT=5
+
+[[ "" == "$PS_DURATION_DEFAULT" ]] && \
+    export readonly PS_DURATION_DEFAULT=300
 
 export ENABLE_MEMINFO
 
 export CONFIG_PS_INTERVAL
+export CONFIG_PS_DURATION
 
 export REQUEST_TERMINATE
+
+export TESTSTEP_START
+export TESTSTEP_DURATIONEND
+export TESTSTEP_END
+export TESTSTEP_ELPASED
+export TESTSTEP_INDEX
 
 function perfsnippet_parse() {
     REQUEST_TERMINATE=false
@@ -21,12 +31,18 @@ function perfsnippet_parse() {
     [[ "0" -lt "$ps_interval" ]] && { \
         CONFIG_PS_INTERVAL=$ps_interval
     }
+
+    CONFIG_PS_DURATION=$PS_DURATION_DEFAULT
+    [[ "0" -lt "$ps_duration" ]] && { \
+        CONFIG_PS_DURATION=$ps_duration
+    }
 }
 
 function perfsnippet_testplan_print() {
     echo "ENABLE_MEMINFO\t$ENABLE_MEMINFO"
 
     echo "CONFIG_PS_INTERVAL\t$CONFIG_PS_INTERVAL"
+    echo "CONFIG_PS_DURATION\t$CONFIG_PS_DURATION"
 }
 
 function perfsnippet_stop() {
@@ -41,13 +57,20 @@ function perfsnippet_testloop_start() {
     perfsnippet_recordstep_prerun
     perfsnippet_teststep_prerun
 
-    while true; do
+    while
         [[ "true" == "$REQUEST_TERMINATE" ]] && break;
+
+        let ++TESTSTEP_INDEX
+        local now=$(timing_print_nowsecond)
 
         local record="$(echo -e "`perfsnippet_recordstep_run`")"
         perfsnippet_teststep_once "$record"
-        perfsnippet_testplan_review
-    done
+
+        local elpased=`timing_print_elpasedsecond $now`
+        let TESTSTEP_ELPASED+=elpased
+
+        [[ "false" == $(perfsnippet_testplan_review) ]]
+    do :; done
 
     perfsnippet_teststep_postrun
     perfsnippet_recordstep_postrun
@@ -66,7 +89,11 @@ function perfsnippet_finish() {
 }
 
 function perfsnippet_teststep_prerun() {
-    echo pass teststep prerun
+    TESTSTEP_INDEX=0
+    TESTSTEP_ELPASED=0
+    TESTSTEP_END=0
+    TESTSTEP_START=$(timing_print_nowsecond)
+    TESTSTEP_DURATIONEND=$(timing_print_timeoutsecond $CONFIG_PS_DURATION)
 }
 
 # 执行recorder
@@ -92,19 +119,22 @@ function perfsnippet_testplan_review() {
     [[ "true" == "$testplan_reached" ]] && { \
         perfsnippet_request_terminate
     }
+    echo $testplan_reached
 }
 
 # 是否达成测试目标
-# TODO
 function perfsnippet_testplan_reached() {
-    echo false
+    [[ "$TESTSTEP_ELPASED" -lt "$CONFIG_PS_DURATION" ]] && { \
+        echo false
+        return
+    }
+    echo true
 }
 
 function perfsnippet_teststep_postrun() {
-    echo pass teststep postrun
+    TESTSTEP_END=$(timing_print_nowsecond)
 
     perfsnippet_signal
-
 }
 
 function perfsnippet_recordstep_prerun() {
@@ -123,6 +153,7 @@ function perfsnippet_recordstep_postrun() {
 function perfsnippet_loadmodule() {
     source module.sh
     module_import utils.sh
+    module_import timing.sh
 
     [[ "true" == "$ENABLE_MEMINFO" ]] && { \
         module_import mem/mem_entry.sh
