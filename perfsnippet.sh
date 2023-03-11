@@ -6,6 +6,7 @@
 [[ "" == "$PS_DURATION_DEFAULT" ]] && \
     export readonly PS_DURATION_DEFAULT=300
 
+export ENABLE_DEBUG
 export ENABLE_MEMINFO
 
 export CONFIG_PS_INTERVAL
@@ -21,6 +22,11 @@ export TESTSTEP_INDEX
 
 function perfsnippet_parse() {
     REQUEST_TERMINATE=false
+
+    ENABLE_DEBUG=false
+    [[ "1" == "$ps_debug" ]] && { \
+        ENABLE_DEBUG=true
+    }
 
     ENABLE_MEMINFO=true
     [[ "1" == "$ps_meminfo_disabled" ]] && { \
@@ -39,6 +45,7 @@ function perfsnippet_parse() {
 }
 
 function perfsnippet_testplan_print() {
+    echo "ENABLE_DEBUG\t$ENABLE_DEBUG"
     echo "ENABLE_MEMINFO\t$ENABLE_MEMINFO"
 
     echo "CONFIG_PS_INTERVAL\t$CONFIG_PS_INTERVAL"
@@ -105,7 +112,7 @@ function perfsnippet_teststep_run() {
 # 输出到目标
 # 执行间隔休眠
 function perfsnippet_teststep_once() {
-    echo new record: $1
+    perfsnippet_printdebug "New record: $1"
     perfsnippet_teststep_interval
 }
 
@@ -178,5 +185,11 @@ function perfsnippet_signal() {
 
 function perfsnippet_request_terminate() {
     REQUEST_TERMINATE=true
+}
+
+function perfsnippet_printdebug() {
+    [[ "true" != "$ENABLE_DEBUG" ]] && return
+
+    echo [debug]"\t$1"
 }
 
