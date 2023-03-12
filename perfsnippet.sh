@@ -185,12 +185,18 @@ function perfsnippet_printstep_prerun() {
     printer_targetinfo
 }
 
+#TODO: 因为第一列存储X坐标，物理意义是表示测试过去的秒
+# 这里传递进来$1是index，实际上秒数应该是index * CONFIG_PS_INTERVAL
 function perfsnippet_printstep_run() {
-    perfsnippet_printdebug "New record: $1"
+    perfsnippet_printdebug perfsnippet_printstep_run: "$TESTSTEP_INDEX" "$*"
+
+    printer_println "$TESTSTEP_INDEX" "$*"
 }
 
 function perfsnippet_printstep_postrun() {
-    echo pass printstep postrun
+    printer_finalize
+
+    PRINTSTEP_FILENAME=
 }
 
 function perfsnippet_loadmodule() {
