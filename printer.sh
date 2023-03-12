@@ -46,10 +46,11 @@ function printer_println() {
     local target_cmd=
 
     [[ "$PRINTER_TARGET_FILE" == "$PRINTER_PRINT_TARGET" ]] && { \
-        target_cmd=" >> $PRINTER_PRINT_FILENAME"
+        echo -e "$line" >> $PRINTER_PRINT_FILENAME
+        return
     }
 
-    eval echo -e "$line" "$target_cmd"
+    echo -e "$line"
 }
 
 function printer_targetinfo_() {
