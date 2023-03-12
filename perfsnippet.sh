@@ -118,6 +118,9 @@ function perfsnippet_teststep_prerun() {
     printer_println "#"
 
     # 2. Print PerfSnippet parameters
+    local testplan="`perfsnippet_testplan_print`"
+    printer_println "#" $testplan
+    printer_println "#"
 
     # 3. Print table column items
 }
