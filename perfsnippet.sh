@@ -131,7 +131,13 @@ function perfsnippet_teststep_prerun() {
 function perfsnippet_teststep_run() {
     perfsnippet_printdebug "PerfSnippet RUNNING"
 
-    mem_recorder_print
+    local result=
+
+    [[ "true" == "$ENABLE_MEMINFO" ]] && { \
+        result="$result`mem_recorder_print`"
+    }
+
+    echo -e "$result"
 }
 
 # 一小步测试步骤完成，执行间隔休眠使其满足间隔要求，根据interval-elpased计算本次需要休眠的时间
