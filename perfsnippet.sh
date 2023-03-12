@@ -12,6 +12,7 @@ export ENABLE_MEMINFO
 export CONFIG_PS_INTERVAL
 export CONFIG_PS_DURATION
 
+export REQUEST_STARTDATETIME
 export REQUEST_TERMINATE
 
 export TESTSTEP_START
@@ -19,6 +20,8 @@ export TESTSTEP_DURATIONEND
 export TESTSTEP_END
 export TESTSTEP_ELPASED
 export TESTSTEP_INDEX
+
+export PRINTSTEP_FILENAME
 
 function perfsnippet_parse() {
     REQUEST_TERMINATE=false
@@ -58,6 +61,8 @@ function perfsnippet_stop() {
     [[ "true" == "$ENABLE_MEMINFO" ]] && { \
         mem_entry_exit
     }
+
+    printer_finalize
 }
 
 function perfsnippet_testloop_start() {
@@ -101,6 +106,20 @@ function perfsnippet_teststep_prerun() {
     TESTSTEP_END=0
     TESTSTEP_START=$(timing_print_nowsecond)
     TESTSTEP_DURATIONEND=$(timing_print_timeoutsecond $CONFIG_PS_DURATION)
+
+    local title="PerfSnippet record"
+    local generatedby="PerfSnippet"
+    local datetime="$REQUEST_STARTDATETIME"
+    local description="Some performance data of Android device"
+
+    # 1. Print gnuplot data file header
+    local header="`plot_datafile_generateheader "$title" "$generatedby" "$datetime" "$description"`"
+    printer_println "$header"
+    printer_println "#"
+
+    # 2. Print PerfSnippet parameters
+
+    # 3. Print table column items
 }
 
 # 执行recorder
@@ -154,8 +173,11 @@ function perfsnippet_teststep_postrun() {
 }
 
 function perfsnippet_printstep_prerun() {
-    echo pass printstep prerun
+    PRINTSTEP_FILENAME="perfsnippet_$REQUEST_STARTDATETIME.data"
 
+    printer_init "$PRINTSTEP_FILENAME"
+
+    printer_targetinfo
 }
 
 function perfsnippet_printstep_run() {
@@ -170,6 +192,8 @@ function perfsnippet_loadmodule() {
     source module.sh
     module_import utils.sh
     module_import timing.sh
+    module_import printer.sh
+    module_import gnuplot/gnuplot_wrapper.sh
 
     [[ "true" == "$ENABLE_MEMINFO" ]] && { \
         module_import mem/mem_entry.sh
@@ -177,6 +201,8 @@ function perfsnippet_loadmodule() {
 }
 
 function perfsnippet() {
+    REQUEST_STARTDATETIME=`timing_print_nowdatetime`
+
     perfsnippet_signal true
     perfsnippet_parse $*
     perfsnippet_loadmodule
@@ -194,6 +220,7 @@ function perfsnippet_signal() {
 
 function perfsnippet_request_terminate() {
     REQUEST_TERMINATE=true
+    perfsnippet_stop
 }
 
 function perfsnippet_printdebug() {
