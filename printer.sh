@@ -46,7 +46,7 @@ function printer_println() {
     local target_cmd=
 
     [[ "$PRINTER_TARGET_FILE" == "$PRINTER_PRINT_TARGET" ]] && { \
-        target_cmd=" >> $PRINTER_TARGET_FILE"
+        target_cmd=" >> $PRINTER_PRINT_FILENAME"
     }
 
     eval echo -e "$line" "$target_cmd"
@@ -62,7 +62,36 @@ function printer_targetinfo() {
 }
 
 function printer_test() {
-    echo printer_test
+    source module.sh
+    module_import timing.sh
+
+    local now=`timing_print_nowdatetime`
+    local filename="printer_test.$now.data"
+
+    echo printer_test RUNNING
+
+    echo Printing to $filename
+    printer_init "$filename" ; { \
+        printer_targetinfo
+
+        printer_println hello
+        printer_println nihao
+        printer_println bonjour
+        printer_println $now $filename
+    }
+    printer_finalize
+
+    echo Printing to $PRINTER_TARGET_STDOUT
+    printer_init && { \
+        printer_targetinfo
+        printer_println hello
+        printer_println nihao
+        printer_println bonjour
+        printer_println 20230312
+    }
+    printer_finalize
+
+    echo printer_test FINISED
 }
 
 function printer_finalize() {
@@ -75,9 +104,11 @@ function printer_finalize() {
 }
 
 function printer_sync() {
-    echo printer_sync
-
     [[ "true" != "$PRINTER_INITED" ]] && return
+    [[ "$PRINTER_TARGET_FILE" != "$PRINTER_PRINT_TARGET" ]] && return
+    [[ "" == "$PRINTER_PRINT_FILENAME" ]] && return
+
+    fsync "$PRINTER_PRINT_FILENAME"
 }
 
 function printer_load() {
