@@ -123,6 +123,8 @@ function perfsnippet_teststep_prerun() {
     printer_println "#"
 
     # 3. Print table column items
+    local tableitem="`perfsnippet_generatetableitem`"
+    printer_println "#" $tableitem
 }
 
 # 执行recorder
@@ -231,5 +233,18 @@ function perfsnippet_printdebug() {
 
     >&2 \
     echo [debug]"\t$*"
+}
+
+function perfsnippet_generatetableitem() {
+    # Index
+    local items='Index'
+
+    # Meminfo
+    [[ "true" == "$ENABLE_MEMINFO" ]] && {\
+        items="$items MemFree(MB)"
+        items="$items MemAvai(MB)"
+    }
+
+    echo -e "$items"
 }
 
