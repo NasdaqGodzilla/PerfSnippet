@@ -53,6 +53,11 @@ export CPU_SYS
 export CPU_OTHER
 export CPU_IDLE
 
+function cpu_recorder_getafterstat() {
+    cpu_recorder_statstep
+    cpu_recorder_get
+}
+
 function cpu_recorder_get() {
     echo `cpu_recorder_getusage` `cpu_recorder_getusr` `cpu_recorder_getsys` `cpu_recorder_getother` `cpu_recorder_getidle`
 }
@@ -211,12 +216,13 @@ function cpu_recorder_test() {
     echo ----- ----- -----
     while
         echo `date +%H:%M:%S`
-        cpu_recorder_statstep
+        echo %Usage %USR %SYS %Other %Idle
+        # cpu_recorder_statstep
+        cpu_recorder_getafterstat
 
         echo `date +%H:%M:%S`
         # echo -e %Usage: `cpu_recorder_getusage` %USR: `cpu_recorder_getusr` %SYS: `cpu_recorder_getsys` %Other: `cpu_recorder_getother` %Idle: `cpu_recorder_getidle`
-        echo %Usage %USR %SYS %Other %Idle
-        echo `cpu_recorder_get`
+        # echo `cpu_recorder_get`
 
         sleep 1
     do :; done
