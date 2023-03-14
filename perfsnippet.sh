@@ -228,7 +228,7 @@ function perfsnippet_printstep_prerun() {
 function perfsnippet_printstep_run() {
     perfsnippet_printdebug perfsnippet_printstep_run: "$TESTSTEP_INDEX" "$TESTSTEP_RECORD"
 
-    printer_println "$TESTSTEP_INDEX" "$*"
+    printer_println "$TESTSTEP_INDEX" "$TESTSTEP_RECORD"
 }
 
 function perfsnippet_printstep_postrun() {
