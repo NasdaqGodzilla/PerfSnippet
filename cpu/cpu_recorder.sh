@@ -243,17 +243,17 @@ function cpu_recorder_reset() {
     CPU_STAT_PREVOTHER=0
     CPU_STAT_PREVIDLE=0
 
-    CPU_STAT_TOTAL=0
-    CPU_STAT_USR=0
-    CPU_STAT_SYS=0
-    CPU_STAT_OTHER=0
-    CPU_STAT_IDLETIME=0
+    CPU_STAT_DIFFTOTAL=0
+    CPU_STAT_DIFFUSR=0
+    CPU_STAT_DIFFSYS=0
+    CPU_STAT_DIFFOTHER=0
+    CPU_STAT_DIFFIDLE=0
 
     CPU_USAGE=0
     CPU_USR=0
     CPU_SYS=0
-    CPU_OTHER=
-    CPU_IDLE=
+    CPU_OTHER=0
+    CPU_IDLE=0
 }
 
 function cpu_recorder_load() {
