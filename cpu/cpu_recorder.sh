@@ -175,11 +175,11 @@ function cpu_recorder_statstep() {
     CPU_STAT_DIFFIDLE="`echo "$idle-$CPU_STAT_PREVIDLE" | bc`"
     CPU_STAT_DIFFTOTAL="`echo "$total-$CPU_STAT_PREVTOTAL" | bc`"
 
-    CPU_USR="`echo "scale=2; $CPU_STAT_DIFFUSR*100/$CPU_STAT_DIFFTOTAL" | bc`"
-    CPU_SYS="`echo "scale=2; $CPU_STAT_DIFFSYS*100/$CPU_STAT_DIFFTOTAL" | bc`"
-    CPU_OTHER="`echo "scale=2; $CPU_STAT_DIFFOTHER*100/$CPU_STAT_DIFFTOTAL" | bc`"
-    CPU_IDLE="`echo "scale=2; $CPU_STAT_DIFFIDLE*100/$CPU_STAT_DIFFTOTAL" | bc`"
-    CPU_USAGE="`echo "scale=2; 100-$CPU_IDLE" | bc`"
+    CPU_USR="`echo "scale=2; $CPU_STAT_DIFFUSR*100/$CPU_STAT_DIFFTOTAL" | bc | awk '{printf "%.2f", $0}'`"
+    CPU_SYS="`echo "scale=2; $CPU_STAT_DIFFSYS*100/$CPU_STAT_DIFFTOTAL" | bc | awk '{printf "%.2f", $0}'`"
+    CPU_OTHER="`echo "scale=2; $CPU_STAT_DIFFOTHER*100/$CPU_STAT_DIFFTOTAL" | bc | awk '{printf "%.2f", $0}'`"
+    CPU_IDLE="`echo "scale=2; $CPU_STAT_DIFFIDLE*100/$CPU_STAT_DIFFTOTAL" | bc | awk '{printf "%.2f", $0}'`"
+    CPU_USAGE="`echo "scale=2; 100-$CPU_IDLE" | bc | awk '{printf "%.2f", $0}'`"
 
     CPU_STAT_PREVUSR="$utime"
     CPU_STAT_PREVSYS="$stime"
