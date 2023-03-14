@@ -254,11 +254,12 @@ function perfsnippet_loadmodule() {
 }
 
 function perfsnippet() {
-    REQUEST_STARTDATETIME=`timing_print_nowdatetime`
-
     perfsnippet_signal true
     perfsnippet_parse $*
     perfsnippet_loadmodule
+
+    REQUEST_STARTDATETIME=`timing_print_nowdatetime`
+
     perfsnippet_start
 }
 
