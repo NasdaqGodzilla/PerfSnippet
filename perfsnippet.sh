@@ -8,6 +8,7 @@
 
 export ENABLE_DEBUG
 export ENABLE_MEMINFO
+export ENABLE_CPUINFO
 
 export CONFIG_PS_INTERVAL
 export CONFIG_PS_DURATION
@@ -20,6 +21,7 @@ export TESTSTEP_DURATIONEND
 export TESTSTEP_END
 export TESTSTEP_ELPASED
 export TESTSTEP_INDEX
+export TESTSTEP_RECORD
 
 export PRINTSTEP_FILENAME
 
@@ -36,6 +38,11 @@ function perfsnippet_parse() {
         ENABLE_MEMINFO=false
     }
 
+    ENABLE_CPUINFO=true
+    [[ "1" == "$ps_cpuinfo_disabled" ]] && { \
+        ENABLE_CPUINFO=false
+    }
+
     CONFIG_PS_INTERVAL=$PS_INTERVAL_DEFAULT
     [[ "0" -lt "$ps_interval" ]] && { \
         CONFIG_PS_INTERVAL=$ps_interval
@@ -50,6 +57,7 @@ function perfsnippet_parse() {
 function perfsnippet_testplan_print() {
     echo "ENABLE_DEBUG\t$ENABLE_DEBUG"
     echo "ENABLE_MEMINFO\t$ENABLE_MEMINFO"
+    echo "ENABLE_CPUINFO\t$ENABLE_CPUINFO"
 
     echo "CONFIG_PS_INTERVAL\t$CONFIG_PS_INTERVAL"
     echo "CONFIG_PS_DURATION\t$CONFIG_PS_DURATION"
@@ -60,6 +68,10 @@ function perfsnippet_stop() {
 
     [[ "true" == "$ENABLE_MEMINFO" ]] && { \
         mem_entry_exit
+    }
+
+    [[ "true" == "$ENABLE_CPUINFO" ]] && { \
+        cpu_entry_exit
     }
 
     printer_finalize
@@ -75,8 +87,8 @@ function perfsnippet_testloop_start() {
         let ++TESTSTEP_INDEX
         local now=$(timing_print_nowsecond)
 
-        local record="$(echo -e "`perfsnippet_teststep_run`")"
-        perfsnippet_printstep_run "$record"
+        perfsnippet_teststep_run
+        perfsnippet_printstep_run
         local elpased=`timing_print_elpasedsecond $now`
         let TESTSTEP_ELPASED+=elpased
         perfsnippet_teststep_once "$elpased"
@@ -98,6 +110,19 @@ function perfsnippet_start() {
 
 function perfsnippet_finish() {
     echo PerfSnippet FINISHED
+
+    [[ "true" == "$ENABLE_MEMINFO" ]] && \
+        mem_recorder_exit
+
+    [[ "true" == "$ENABLE_CPUINFO" ]] && \
+        cpu_recorder_exit
+
+    plot_exit
+
+    printer_exit
+    utils_exit
+    timing_exit
+    module_exit
 }
 
 function perfsnippet_teststep_prerun() {
@@ -127,17 +152,20 @@ function perfsnippet_teststep_prerun() {
     printer_println "#" $tableitem
 }
 
-# 执行recorder
 function perfsnippet_teststep_run() {
     perfsnippet_printdebug "PerfSnippet RUNNING"
 
-    local result=
-
     [[ "true" == "$ENABLE_MEMINFO" ]] && { \
-        result="$result`mem_recorder_print`"
+        TESTSTEP_RECORD="$TESTSTEP_RECORD`mem_recorder_print`"
     }
+    perfsnippet_printdebug "teststep_run MEM: $TESTSTEP_RECORD"
 
-    echo -e "$result"
+    [[ "true" == "$ENABLE_CPUINFO" ]] && { \
+        cpu_recorder_statstep
+        local cpustat="`cpu_recorder_get`"
+        TESTSTEP_RECORD="$TESTSTEP_RECORD $cpustat"
+    }
+    perfsnippet_printdebug "teststep_run CPU: $TESTSTEP_RECORD"
 }
 
 # 一小步测试步骤完成，执行间隔休眠使其满足间隔要求，根据interval-elpased计算本次需要休眠的时间
@@ -157,6 +185,8 @@ function perfsnippet_teststep_once() {
 
     sleep $would_sleep
     let TESTSTEP_ELPASED+=would_sleep
+
+    TESTSTEP_RECORD=
 }
 
 # 确认测试计划是否完成，决定是否继续进行测试
@@ -186,6 +216,8 @@ function perfsnippet_teststep_postrun() {
 function perfsnippet_printstep_prerun() {
     PRINTSTEP_FILENAME="perfsnippet_$REQUEST_STARTDATETIME.data"
 
+    cpu_recorder_init
+
     printer_init "$PRINTSTEP_FILENAME"
 
     printer_targetinfo
@@ -194,7 +226,7 @@ function perfsnippet_printstep_prerun() {
 #TODO: 因为第一列存储X坐标，物理意义是表示测试过去的秒
 # 这里传递进来$1是index，实际上秒数应该是index * CONFIG_PS_INTERVAL
 function perfsnippet_printstep_run() {
-    perfsnippet_printdebug perfsnippet_printstep_run: "$TESTSTEP_INDEX" "$*"
+    perfsnippet_printdebug perfsnippet_printstep_run: "$TESTSTEP_INDEX" "$TESTSTEP_RECORD"
 
     printer_println "$TESTSTEP_INDEX" "$*"
 }
@@ -214,6 +246,10 @@ function perfsnippet_loadmodule() {
 
     [[ "true" == "$ENABLE_MEMINFO" ]] && { \
         module_import mem/mem_entry.sh
+    }
+
+    [[ "true" == "$ENABLE_CPUINFO" ]] && { \
+        module_import cpu/cpu_entry.sh
     }
 }
 
@@ -257,6 +293,14 @@ function perfsnippet_generatetableitem() {
         items="$items MemAvai(MB)"
     }
 
+    # Cpuinfo
+    [[ "true" == "$ENABLE_CPUINFO" ]] && {\
+        items="$items Usage(%)"
+        items="$items USR(%)"
+        items="$items SYS(%)"
+        items="$items Other(%)"
+        items="$items Idle(%)"
+    }
     echo -e "$items"
 }
 
