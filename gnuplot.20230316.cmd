@@ -46,6 +46,6 @@ plot \
 # Output
 set size 1.0, 1.0
 set term svg size 1200, 800 #"Helvetica" 16
-set output 'output_perfsnippet.svg'
+set output 'output_perfsnippet_'.strftime('%Y%m%d@%H%M%S', time(0)).'.svg'
 replot
 
