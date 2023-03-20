@@ -2,7 +2,6 @@ set ylabel "Mem(MB)"
 set y2label "Percentage(%)"
 set y2tics 0, 10, 100
 set y2range [0:100]
-set size 1.0, 1.0
 set autoscale x
 set autoscale y
 set title "PerfSnippet Report(Full)"

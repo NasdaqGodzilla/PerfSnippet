@@ -13,4 +13,3 @@ set style fill solid 0.66
 set boxwidth 0.50
 set autoscale x
 set autoscale y
-set size 1.0, 1.0
