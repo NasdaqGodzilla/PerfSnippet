@@ -38,7 +38,7 @@ ps_gendatafile="perfsnippet_$ps_startdatetime.data"
 ps_gendatapath="output/$ps_startdatetime"
 
 module_envsetup
-$ADB_CMD_SHELL "(cd $MODULE_ADBPATH/perfsnippet/; source perfsnippet.sh; ps_startdatetime=$ps_startdatetime ps_debug=$ps_debug ps_interval=$ps_interval ps_duration=$ps_duration ps_adbtarget=$ps_adbtarget perfsnippet)"
+$ADB_CMD_SHELL "(cd $MODULE_ADBPATH/perfsnippet/; source perfsnippet.sh; ps_meminfo_disabled=$ps_meminfo_disabled ps_cpuinfo_disabled=$ps_cpuinfo_disabled ps_startdatetime=$ps_startdatetime ps_debug=$ps_debug ps_interval=$ps_interval ps_duration=$ps_duration ps_adbtarget=$ps_adbtarget perfsnippet)"
 module_pulltestdata
 ondatapulled
 trap - SIGHUP SIGINT SIGTERM EXIT
