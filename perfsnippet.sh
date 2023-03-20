@@ -6,6 +6,9 @@
 [[ "" == "$PS_DURATION_DEFAULT" ]] && \
     export readonly PS_DURATION_DEFAULT=300
 
+[[ "" == "$PS_OUTPUTDIR_DEFAULT" ]] && \
+    export readonly PS_OUTPUTDIR_DEFAULT=output
+
 export ENABLE_DEBUG
 export ENABLE_MEMINFO
 export ENABLE_CPUINFO
@@ -259,6 +262,7 @@ function perfsnippet() {
     perfsnippet_loadmodule
 
     REQUEST_STARTDATETIME=`timing_print_nowdatetime`
+    mkdir -p $PS_OUTPUTDIR_DEFAULT/$REQUEST_STARTDATETIME
 
     perfsnippet_start
 }
