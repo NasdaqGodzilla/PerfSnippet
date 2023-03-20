@@ -13,6 +13,8 @@ Collect Android performance data via adb shell script, output the data in CSV fo
 - 记录数据到一个易于阅读或处理的CSV格式文件
 - 通过gnuplot将数据绘制为图表
 
+- - -
+
 - Collect CPU/MEM usage
 - TODO: Collect FPS/Network/LoadAver usage
 - Record performance data to a file, which has a CSV format that is easily readable by humans or processed by computer programing language
@@ -27,6 +29,36 @@ A typical data file that PerfSnippet collected and recorded:
 Draws to charts by gnuplot:
 
 ![](https://cdn.jsdelivr.net/gh/NasdaqGodzilla/PeacePicture/img/output_perfsnippet_20230320_160624.data@20230320_081636.svg)
+
+# Setup
+
+Star, then git clone or download via Releases.
+
+# Usage
+
+run.sh as entry and it will proceed env setup, performance data recording and output picture drawing. Feature switch controlled by env args:
+
+run.sh启动工具，自动完成环境搭建、数据收集、绘图工作，修改变量可以实现功能开关控制:
+
+```
+arg=var source run.sh
+```
+
+Feature switch controlled by env args as follow:
+
+参数列表(功能列表):
+
+1. ps_debug: enable to print debug message 打印调试信息
+2. ps_interval: set number to control time interval between ticks 控制数据采集时间间隔
+3. ps_duration: set number to control the duration of the executio 控制采集多长的时间
+4. ps_adbtarget: set to control the adb target to run, default is current connected device. It works under where devices is more than one, but will not connect to device automatically. 控制运行的adb device设备，默认为当前设备。不会自动连接设备，只用于在多设备环境下区分设备
+5. ps_cpuinfo_disabled ps_meminfo_disabled: enable to disable record corresponding data 不记录对应类别的数据
+
+- Run, interal ticks is 2 second, duration 600 seconds
+
+```
+ps_inteval=2 ps_duration=600 source run.sh
+```
 
 # LICENSE
 
