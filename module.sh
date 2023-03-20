@@ -17,6 +17,11 @@ function module_envsetup() {
     local target="$1"
     local cmdpush="adb push -s $target "
     local cmdshell="adb -s $target shell "
+
+    [[ "" == "$target" ]] && { \
+        target="$ps_adbtarget"
+    }
+
     [[ "" == "$target" ]] && { \
         cmdpush="adb push "
         cmdshell="adb shell "
