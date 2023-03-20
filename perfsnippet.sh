@@ -271,7 +271,11 @@ function perfsnippet() {
     perfsnippet_parse $*
     perfsnippet_loadmodule
 
-    REQUEST_STARTDATETIME=`timing_print_nowdatetime`
+    REQUEST_STARTDATETIME="$ps_startdatetime"
+    [[ "" == "$REQUEST_STARTDATETIME" ]] && { \
+        REQUEST_STARTDATETIME=`timing_print_nowdatetime`
+    }
+
     mkdir -p $PS_OUTPUTDIR_DEFAULT/$REQUEST_STARTDATETIME
 
     perfsnippet_start
