@@ -34,6 +34,13 @@ Draws to charts by gnuplot:
 
 Star, then git clone or download via Releases.
 
+Note: init submodule after git clone:
+
+```
+git submodule init
+git submodule update
+```
+
 # Usage
 
 run.sh as entry and it will proceed env setup, performance data recording and output picture drawing. Feature switch controlled by env args:
