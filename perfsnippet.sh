@@ -95,6 +95,7 @@ function perfsnippet_testloop_start() {
     while
         [[ "true" == "$REQUEST_TERMINATE" ]] && break;
 
+        let ++TESTSTEP_INDEX
         local now=$(timing_print_nowsecond)
 
         perfsnippet_teststep_run
@@ -102,8 +103,6 @@ function perfsnippet_testloop_start() {
         local elpased=`timing_print_elpasedsecond $now`
         let TESTSTEP_ELPASED+=elpased
         perfsnippet_teststep_once "$elpased"
-
-        let ++TESTSTEP_INDEX
 
         [[ "false" == $(perfsnippet_testplan_review) ]]
     do :; done
