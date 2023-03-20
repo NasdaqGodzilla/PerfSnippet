@@ -66,7 +66,7 @@ function printer_test() {
     source module.sh
     module_import timing.sh
 
-    local now=`timing_print_nowdatetime`
+    local now="$REQUEST_STARTDATETIME"
     local filename="printer_test.$now.data"
 
     echo printer_test RUNNING
