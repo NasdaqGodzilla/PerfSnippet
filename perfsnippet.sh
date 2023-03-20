@@ -15,6 +15,7 @@ export ENABLE_CPUINFO
 
 export CONFIG_PS_INTERVAL
 export CONFIG_PS_DURATION
+export CONFIG_PS_ADBTARGET
 
 export REQUEST_STARTDATETIME
 export REQUEST_TERMINATE
@@ -54,6 +55,11 @@ function perfsnippet_parse() {
     CONFIG_PS_DURATION=$PS_DURATION_DEFAULT
     [[ "0" -lt "$ps_duration" ]] && { \
         CONFIG_PS_DURATION=$ps_duration
+    }
+
+    CONFIG_PS_ADBTARGET=
+    [[ "" -ne "$ps_adbtarget" ]] && { \
+        CONFIG_PS_ADBTARGET=$ps_adbtarget
     }
 }
 
@@ -238,6 +244,18 @@ function perfsnippet_printstep_postrun() {
     printer_finalize
 
     PRINTSTEP_FILENAME=
+}
+
+function perfsnippet_printstep_pulltestdata() {
+    local pathtestdata="$MODULE_ADBPATH/perfsnippet/output/$PRINTSTEP_FILENAME"
+    local cmdpull="adb -s $CONFIG_PS_ADBTARGET pull --sync "
+
+    [[ "" == "$CONFIG_PS_ADBTARGET" ]] && { \
+        cmdpull="adb pull --sync "
+    }
+
+    mkdir -p output
+    $cmdpull $MODULE_ADBPATH/perfsnippet/output/
 }
 
 function perfsnippet_loadmodule() {
