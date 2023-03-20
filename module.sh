@@ -1,5 +1,10 @@
 #!/bin/bash
 
+export ADB_TARGET
+export ADB_CMD_PUSH
+export ADB_CMD_PULL
+export ADB_CMD_SHELL
+
 [[ "" == "$MODULE_ADBPATH" ]] && \
     export readonly MODULE_ADBPATH="/data/local/tmp"
 
@@ -16,6 +21,7 @@ function module_cwd() {
 function module_envsetup() {
     local target="$1"
     local cmdpush="adb push -s $target --sync "
+    local cmdpull="adb pull -s $target "
     local cmdshell="adb -s $target shell "
 
     [[ "" == "$target" ]] && { \
@@ -24,20 +30,35 @@ function module_envsetup() {
 
     [[ "" == "$target" ]] && { \
         cmdpush="adb push --sync "
+        cmdpull="adb pull "
         cmdshell="adb shell "
     }
 
-    $cmdshell mkdir -p $MODULE_ADBPATH/perfsnippet/cpu
-    $cmdshell mkdir -p $MODULE_ADBPATH/perfsnippet/gnuplot
-    $cmdshell mkdir -p $MODULE_ADBPATH/perfsnippet/mem
+    ADB_TARGET="$target"
+    ADB_CMD_PUSH="$cmdpush"
+    ADB_CMD_PULL="$cmdpull"
+    ADB_CMD_SHELL="$cmdshell"
 
-    $cmdpush cpu/ $MODULE_ADBPATH/perfsnippet/
-    $cmdpush gnuplot/ $MODULE_ADBPATH/perfsnippet/
-    $cmdpush mem/ $MODULE_ADBPATH/perfsnippet/
+    $ADB_CMD_SHELL mkdir -p $MODULE_ADBPATH/perfsnippet/cpu
+    $ADB_CMD_SHELL mkdir -p $MODULE_ADBPATH/perfsnippet/gnuplot
+    $ADB_CMD_SHELL mkdir -p $MODULE_ADBPATH/perfsnippet/mem
+
+    $ADB_CMD_PUSH cpu/ $MODULE_ADBPATH/perfsnippet/
+    $ADB_CMD_PUSH gnuplot/ $MODULE_ADBPATH/perfsnippet/
+    $ADB_CMD_PUSH mem/ $MODULE_ADBPATH/perfsnippet/
     local i
     for i in *.sh; do
-        $cmdpush $i $MODULE_ADBPATH/perfsnippet/
+        $ADB_CMD_PUSH $i $MODULE_ADBPATH/perfsnippet/
     done
+}
+
+function module_pulltestdata() {
+    if [ ! -d "output" ]; then
+        mkdir -p output
+    fi
+
+    local pathtestdata="$MODULE_ADBPATH/perfsnippet/output/$PRINTSTEP_FILENAME"
+    $ADB_CMD_PULL $MODULE_ADBPATH/perfsnippet/output/
 }
 
 function module_load() {

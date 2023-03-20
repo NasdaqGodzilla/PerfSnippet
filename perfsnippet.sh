@@ -18,6 +18,8 @@ export CONFIG_PS_DURATION
 export CONFIG_PS_ADBTARGET
 
 export REQUEST_STARTDATETIME
+export REQUEST_OUTPUTPATH
+export REQUEST_OUTPUTFILE
 export REQUEST_TERMINATE
 
 export TESTSTEP_START
@@ -227,7 +229,9 @@ function perfsnippet_printstep_prerun() {
 
     cpu_recorder_init
 
-    printer_init "$PRINTSTEP_FILENAME"
+    REQUEST_OUTPUTPATH="$PS_OUTPUTDIR_DEFAULT/$REQUEST_STARTDATETIME"
+    REQUEST_OUTPUTFILE="$REQUEST_OUTPUTPATH/$PRINTSTEP_FILENAME"
+    printer_init "$REQUEST_OUTPUTFILE"
 
     printer_targetinfo
 }
@@ -244,18 +248,6 @@ function perfsnippet_printstep_postrun() {
     printer_finalize
 
     PRINTSTEP_FILENAME=
-}
-
-function perfsnippet_printstep_pulltestdata() {
-    local pathtestdata="$MODULE_ADBPATH/perfsnippet/output/$PRINTSTEP_FILENAME"
-    local cmdpull="adb -s $CONFIG_PS_ADBTARGET pull --sync "
-
-    [[ "" == "$CONFIG_PS_ADBTARGET" ]] && { \
-        cmdpull="adb pull --sync "
-    }
-
-    mkdir -p output
-    $cmdpull $MODULE_ADBPATH/perfsnippet/output/
 }
 
 function perfsnippet_loadmodule() {
