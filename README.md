@@ -2,13 +2,31 @@
 
 Performance Snippet. 性能片段。
 
-提供adb shell中执行的脚本、工具，用于监测、统计Android性能数据。
+通过adb shell脚本，收集Android性能数据，输出csv格式文件，通过gnuplot绘图展示
 
-# mem
+Collect Android performance data via adb shell script, output the data in CSV format, and display it drawing by gnuplot.
 
-## mem_monitor
+# Feature
 
-根据/proc/meminfo中的MemAvaiable、MemFree，统计窗口时间内的最小值和平均值。
+- 收集CPU/内存使用数据
+- TODO：收集FPS/Network/LoadAver使用数据
+- 记录数据到一个易于阅读或处理的CSV格式文件
+- 通过gnuplot将数据绘制为图表
+
+- Collect CPU/MEM usage
+- TODO: Collect FPS/Network/LoadAver usage
+- Record performance data to a file, which has a CSV format that is easily readable by humans or processed by computer programing language
+- Plots data as a chart using gnuplot
+
+# Example
+
+A typical data file that PerfSnippet collected and recorded:
+
+![](https://cdn.jsdelivr.net/gh/NasdaqGodzilla/PeacePicture/img/PerfSnippet_README_data.png)
+
+Draws to charts by gnuplot:
+
+![](https://cdn.jsdelivr.net/gh/NasdaqGodzilla/PeacePicture/img/output_perfsnippet_20230320_160624.data@20230320_081636.svg)
 
 # LICENSE
 
