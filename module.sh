@@ -15,7 +15,7 @@ function module_cwd() {
 
 function module_envsetup() {
     local target="$1"
-    local cmdpush="adb push -s $target "
+    local cmdpush="adb push -s $target --sync "
     local cmdshell="adb -s $target shell "
 
     [[ "" == "$target" ]] && { \
@@ -23,7 +23,7 @@ function module_envsetup() {
     }
 
     [[ "" == "$target" ]] && { \
-        cmdpush="adb push "
+        cmdpush="adb push --sync "
         cmdshell="adb shell "
     }
 
@@ -31,9 +31,9 @@ function module_envsetup() {
     $cmdshell mkdir -p $MODULE_ADBPATH/perfsnippet/gnuplot
     $cmdshell mkdir -p $MODULE_ADBPATH/perfsnippet/mem
 
-    $cmdpush cpu/ $MODULE_ADBPATH/perfsnippet/cpu
-    $cmdpush gnuplot/ $MODULE_ADBPATH/perfsnippet/gnuplot
-    $cmdpush mem/ $MODULE_ADBPATH/perfsnippet/mem
+    $cmdpush cpu/ $MODULE_ADBPATH/perfsnippet/
+    $cmdpush gnuplot/ $MODULE_ADBPATH/perfsnippet/
+    $cmdpush mem/ $MODULE_ADBPATH/perfsnippet/
     local i
     for i in *.sh; do
         $cmdpush $i $MODULE_ADBPATH/perfsnippet/
@@ -52,6 +52,4 @@ function module_exit() {
 if [[ "$MODULE_MODULE_LOADED" != 'true' ]]; then
     module_load
 fi
-
-module_envsetup
 
