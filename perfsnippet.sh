@@ -12,6 +12,7 @@
 export ENABLE_DEBUG
 export ENABLE_MEMINFO
 export ENABLE_CPUINFO
+export ENABLE_GFXINFO
 
 export CONFIG_PS_INTERVAL
 export CONFIG_PS_DURATION
@@ -49,6 +50,11 @@ function perfsnippet_parse() {
         ENABLE_CPUINFO=false
     }
 
+    ENABLE_GFXINFO=true
+    [[ "1" == "$ps_gfxinfo_disabled" ]] && { \
+        ENABLE_GFXINFO=false
+    }
+
     CONFIG_PS_INTERVAL=$PS_INTERVAL_DEFAULT
     [[ "0" -lt "$ps_interval" ]] && { \
         CONFIG_PS_INTERVAL=$ps_interval
@@ -69,6 +75,7 @@ function perfsnippet_testplan_print() {
     echo "ENABLE_DEBUG\t$ENABLE_DEBUG"
     echo "ENABLE_MEMINFO\t$ENABLE_MEMINFO"
     echo "ENABLE_CPUINFO\t$ENABLE_CPUINFO"
+    echo "ENABLE_GFXINFO\t$ENABLE_GFXINFO"
 
     echo "CONFIG_PS_INTERVAL\t$CONFIG_PS_INTERVAL"
     echo "CONFIG_PS_DURATION\t$CONFIG_PS_DURATION"
@@ -83,6 +90,11 @@ function perfsnippet_stop() {
 
     [[ "true" == "$ENABLE_CPUINFO" ]] && { \
         cpu_entry_exit
+    }
+
+    # TODO
+    [[ "true" == "$ENABLE_GFXINFO" ]] && { \
+        gfx_entry_exit
     }
 
     printer_finalize
@@ -127,6 +139,10 @@ function perfsnippet_finish() {
 
     [[ "true" == "$ENABLE_CPUINFO" ]] && \
         cpu_recorder_exit
+
+    # [[ "true" == "$ENABLE_GFXINFO" ]] && { \
+        # module_import gfx/utils.sh
+    # }
 
     plot_exit
 
@@ -177,6 +193,13 @@ function perfsnippet_teststep_run() {
         TESTSTEP_RECORD="$TESTSTEP_RECORD $cpustat"
     }
     perfsnippet_printdebug "teststep_run CPU: $TESTSTEP_RECORD"
+
+    [[ "true" == "$ENABLE_GFXINFO" ]] && { \
+        local get_fps="`source gfx/get_fps.sh`"
+        local fps="`echo -e "$get_fps" | awk '{print $2}'`"
+        TESTSTEP_RECORD="$TESTSTEP_RECORD $fps"
+    }
+    perfsnippet_printdebug "teststep_run GFX: $TESTSTEP_RECORD"
 }
 
 # 一小步测试步骤完成，执行间隔休眠使其满足间隔要求，根据interval-elpased计算本次需要休眠的时间
@@ -264,6 +287,10 @@ function perfsnippet_loadmodule() {
     [[ "true" == "$ENABLE_CPUINFO" ]] && { \
         module_import cpu/cpu_entry.sh
     }
+
+    [[ "true" == "$ENABLE_GFXINFO" ]] && { \
+        module_import gfx/utils.sh
+    }
 }
 
 function perfsnippet() {
@@ -320,6 +347,12 @@ function perfsnippet_generatetableitem() {
         items="$items Other(%)"
         items="$items Idle(%)"
     }
+
+    # Gfxinfo
+    [[ "true" == "$ENABLE_GFXINFO" ]] && {\
+        items="$items FPS"
+    }
+
     echo -e "$items"
 }
 
