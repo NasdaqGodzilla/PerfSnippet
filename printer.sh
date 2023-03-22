@@ -46,7 +46,9 @@ function printer_println() {
     local target_cmd=
 
     [[ "$PRINTER_TARGET_FILE" == "$PRINTER_PRINT_TARGET" ]] && { \
+        flock -x "$PRINTER_PRINT_FILENAME"
         echo -e "$line" >> $PRINTER_PRINT_FILENAME
+        flock -u "$PRINTER_PRINT_FILENAME"
         printer_sync
         return
     }
