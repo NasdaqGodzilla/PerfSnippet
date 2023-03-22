@@ -204,6 +204,8 @@ function perfsnippet_teststep_run() {
 
 # 一小步测试步骤完成，执行间隔休眠使其满足间隔要求，根据interval-elpased计算本次需要休眠的时间
 function perfsnippet_teststep_once() {
+    TESTSTEP_RECORD=
+
     local elpased="$1"
     local would_sleep="$(echo $CONFIG_PS_INTERVAL-$elpased | bc)"
     [[ "0" -gt "$would_sleep" ]] && would_sleep=0
@@ -219,8 +221,6 @@ function perfsnippet_teststep_once() {
 
     sleep $would_sleep
     let TESTSTEP_ELPASED+=would_sleep
-
-    TESTSTEP_RECORD=
 }
 
 # 确认测试计划是否完成，决定是否继续进行测试
