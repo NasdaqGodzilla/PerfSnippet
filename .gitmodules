@@ -4,3 +4,6 @@
 [submodule "mem"]
 	path = mem
 	url = git@github.com:NasdaqGodzilla/AndroidMEM.git
+[submodule "gfx"]
+	path = gfx
+	url = https://github.com/NasdaqGodzilla/GetFPS
