@@ -42,10 +42,12 @@ function module_envsetup() {
     $ADB_CMD_SHELL mkdir -p $MODULE_ADBPATH/perfsnippet/cpu
     $ADB_CMD_SHELL mkdir -p $MODULE_ADBPATH/perfsnippet/gnuplot
     $ADB_CMD_SHELL mkdir -p $MODULE_ADBPATH/perfsnippet/mem
+    $ADB_CMD_SHELL mkdir -p $MODULE_ADBPATH/perfsnippet/gfx
 
     $ADB_CMD_PUSH cpu/ $MODULE_ADBPATH/perfsnippet/
     $ADB_CMD_PUSH gnuplot/ $MODULE_ADBPATH/perfsnippet/
     $ADB_CMD_PUSH mem/ $MODULE_ADBPATH/perfsnippet/
+    $ADB_CMD_PUSH gfx/ $MODULE_ADBPATH/perfsnippet/
     local i
     for i in *.sh; do
         $ADB_CMD_PUSH $i $MODULE_ADBPATH/perfsnippet/
