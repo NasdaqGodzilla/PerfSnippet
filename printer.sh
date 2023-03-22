@@ -47,6 +47,7 @@ function printer_println() {
 
     [[ "$PRINTER_TARGET_FILE" == "$PRINTER_PRINT_TARGET" ]] && { \
         echo -e "$line" >> $PRINTER_PRINT_FILENAME
+        printer_sync
         return
     }
 
