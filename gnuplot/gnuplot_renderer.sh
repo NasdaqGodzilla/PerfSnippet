@@ -81,7 +81,9 @@ function plot_render_init_each() {
         let column++
         cmd_plot="$cmd_plot DATAFILE u 1:$column axis x1y2 t \"CPU SYS(%)\" s b lw 2,"
         let column++
-        cmd_plot="$cmd_plot DATAFILE u 1:$column axis x1y2 t \"CPU Other(%)\" s b lw 2"
+        cmd_plot="$cmd_plot DATAFILE u 1:$column axis x1y2 t \"CPU Other(%)\" s b lw 2,"
+        let column++
+        cmd_plot="$cmd_plot DATAFILE u 1:$column axis x1y2 t \"CPU Idle(%)\" s b lw 2"
         let column++
 
         plot_render_cmdfrom "$PLOT_SCRIPTFILE_CPU"
