@@ -63,20 +63,36 @@ function plot_render_init_outputsize() {
 function plot_render_init_each() {
     plot_render_cmdfrom "$PLOT_SCRIPTFILE_INIT"
 
+    local column=2
+
     [[ "true" == "$ENABLE_MEMINFO" ]] && [[ "true" == "$ENABLE_CPUINFO" ]] && { \
         plot_render_cmdfrom "$PLOT_SCRIPTFILE_CPUMEM"
     }
 
     [[ "true" == "$ENABLE_MEMINFO" ]] && { \
         plot_render_cmdfrom "$PLOT_SCRIPTFILE_MEM"
+        let column+=2
     }
 
     [[ "true" == "$ENABLE_CPUINFO" ]] && { \
+        local cmd_plot="plot DATAFILE u 1:$column axis x1y2 t \"CPU Usage(%)\" s b lw 2,"
+        let column++
+        cmd_plot="$cmd_plot DATAFILE u 1:$column axis x1y2 t \"CPU USR(%)\" s b lw 2,"
+        let column++
+        cmd_plot="$cmd_plot DATAFILE u 1:$column axis x1y2 t \"CPU SYS(%)\" s b lw 2,"
+        let column++
+        cmd_plot="$cmd_plot DATAFILE u 1:$column axis x1y2 t \"CPU Other(%)\" s b lw 2"
+        let column++
+
         plot_render_cmdfrom "$PLOT_SCRIPTFILE_CPU"
+        plot_render_cmdconcat "$cmd_plot"
     }
 
     [[ "true" == "$ENABLE_GFXINFO" ]] && { \
+        local cmd_plot="plot DATAFILE u 1:$column axis x1y1 t 'FPS' s b lw 2"
         plot_render_cmdfrom "$PLOT_SCRIPTFILE_GFX"
+        plot_render_cmdconcat "$cmd_plot"
+        let column+=1
     }
 }
 
