@@ -29,6 +29,11 @@ ENABLE_CPUINFO=true
     ENABLE_CPUINFO=false
 }
 
+ENABLE_GFXINFO=true
+[[ "1" == "$ps_gfxinfo_disabled" ]] && { \
+    ENABLE_GFXINFO=false
+}
+
 trap onexit SIGHUP SIGINT SIGTERM EXIT
 source module.sh
 module_import timing.sh

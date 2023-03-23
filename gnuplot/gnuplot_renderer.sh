@@ -12,6 +12,9 @@
 [[ "" == "$PLOT_SCRIPTFILE_CPUMEM" ]] && \
     export readonly PLOT_SCRIPTFILE_CPUMEM='gnuplot/gnuplot.cpumem.cmd'
 
+[[ "" == "$PLOT_SCRIPTFILE_GFX" ]] && \
+    export readonly PLOT_SCRIPTFILE_GFX='gnuplot/gnuplot.gfx.cmd'
+
 export PLOT_RENDER_COMMAND
 
 function plot_render_init() {
@@ -44,6 +47,10 @@ function plot_render_init_outputsize() {
         let layout+=2
     }
 
+    [[ "true" == "$ENABLE_GFXINFO" ]] && { \
+        let ++layout
+    }
+
     let height=layout*400
 
     # local cmd="set term svg size 1000, $height #\"Helvetica\" 16"
@@ -66,6 +73,10 @@ function plot_render_init_each() {
 
     [[ "true" == "$ENABLE_CPUINFO" ]] && { \
         plot_render_cmdfrom "$PLOT_SCRIPTFILE_CPU"
+    }
+
+    [[ "true" == "$ENABLE_GFXINFO" ]] && { \
+        plot_render_cmdfrom "$PLOT_SCRIPTFILE_GFX"
     }
 }
 

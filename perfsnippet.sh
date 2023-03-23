@@ -93,9 +93,9 @@ function perfsnippet_stop() {
     }
 
     # TODO
-    [[ "true" == "$ENABLE_GFXINFO" ]] && { \
-        gfx_entry_exit
-    }
+    # [[ "true" == "$ENABLE_GFXINFO" ]] && { \
+        # gfx_entry_exit
+    # }
 
     printer_finalize
 }
