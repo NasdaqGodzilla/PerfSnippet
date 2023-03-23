@@ -32,7 +32,7 @@ Draws to charts by gnuplot:
 
 FPS charts:
 
-![](https://cdn.jsdelivr.net/gh/NasdaqGodzilla/PeacePicture/img/perfsnippet_example_fps.png)
+![](https://cdn.jsdelivr.net/gh/NasdaqGodzilla/PeacePicture/img/perfsnippet_example_fps_new.png)
 
 # Setup
 
