@@ -259,12 +259,12 @@ function perfsnippet_printstep_prerun() {
     printer_targetinfo
 }
 
-#TODO: 因为第一列存储X坐标，物理意义是表示测试过去的秒
-# 这里传递进来$1是index，实际上秒数应该是index * CONFIG_PS_INTERVAL
 function perfsnippet_printstep_run() {
-    perfsnippet_printdebug perfsnippet_printstep_run: "$TESTSTEP_INDEX" "$TESTSTEP_RECORD"
+    local elpased_seconds=0
+    let elpased_seconds="TESTSTEP_INDEX*CONFIG_PS_INTERVAL"
+    perfsnippet_printdebug perfsnippet_printstep_run: "$TESTSTEP_INDEX" "$elpased_seconds" "$TESTSTEP_RECORD"
 
-    printer_println "$TESTSTEP_INDEX" "$TESTSTEP_RECORD"
+    printer_println "$elpased_seconds" "$TESTSTEP_RECORD"
 }
 
 function perfsnippet_printstep_postrun() {
